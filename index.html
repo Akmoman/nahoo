@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مسابقة النحو القرآني</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f9fafb;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Custom scrollbar for better look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen text-right">
+
+    <div id="app" class="min-h-screen flex flex-col items-center justify-start p-4">
+        <!-- Content will be injected here by JavaScript -->
+    </div>
+
+    <script>
+        // --------------------------------------------------------------------------
+        // Data Structure
+        // --------------------------------------------------------------------------
+        const quizData = [
+            {
+                title: "الدرس الأول: مراجعة عامة",
+                questions: [
+                    { q: "متى يُنصب الفعل المضارع بـ 'أن' المضمرة وجوباً من الخيارات الآتية؟", options: ["بعد لام الجحود المسبوقة بـ 'ما كان'", "بعد فاء السببية", "بعد واو المعية وحتى", "جميع ما سبق صحيح"], answer: 3 },
+                    { q: "ما علامة نصب الفعل المضارع في قوله تعالى: {حَتَّىٰ يَقُولَا إِنَّمَا نَحْنُ فِتْنَةٌ}؟", options: ["الفتحة الظاهرة", "حذف حرف العلة", "حذف النون", "ثبوت النون"], answer: 2 },
+                    { q: "ما إعراب كلمة 'وَاسِعٌ' في قوله تعالى: {إِنَّ اللَّهَ وَاسِعٌ عَلِيمٌ}؟", options: ["مبتدأ مرفوع بالضمة", "خبر إن مرفوع وعلامة رفعه الضمة", "صفة مرفوعة بالضمة", "خبر ثانٍ مرفوع"], answer: 1 },
+                    { q: "ما إعراب كلمة 'قَانِتُونَ' في قوله تعالى: {كُلٌّ لَّهُ قَانِتُونَ}؟", options: ["فاعل مرفوع بالواو", "نعت مرفوع", "خبر مرفوع وعلامة رفعه الواو لأنه جمع مذكر سالم", "مبتدأ مؤخر"], answer: 2 },
+                    { q: "ما علامة بناء فعل الأمر 'اهْدِ' في قوله تعالى: {اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ}؟", options: ["السكون", "الفتح", "حذف حرف العلة", "حذف النون"], answer: 2 },
+                    { q: "المُثنّى هو اسم دلّ على اثنين أو اثنتين بزيادة:", options: ["ألف ونون في حالة النصب، وواو ونون في حالة الرفع", "ألف ونون في حالة الرفع، وياء ونون في حالة الجر والنصب", "ألف ونون في حالة الجر، وياء ونون في حالة الرفع", "واو ونون في الرفع والنصب"], answer: 1 },
+                    { q: "أي الجمل الآتية صحيحة نحوياً؟", options: ["ظل المسلمون محافظين على أخلاقهم", "إن المسلمين محافظين على أخلاقهم", "بات المسلمين محافظين على أخلاقهم", "ليت المسلمون محافظون على أخلاقهم"], answer: 0 },
+                    { q: "ما إعراب الفعل 'تُزِغْ' في قوله تعالى: {رَبَّنَا لَا تُزِغْ قُلُوبَنَا}؟", options: ["فعل مضارع مرفوع بالضمة", "فعل ماض مبني", "فعل مضارع منصوب بالفتحة", "فعل مضارع مجزوم"], answer: 3 },
+                    { q: "ما الكلمة التي تعرب مفعولاً به منصوباً وعلامة نصبه الكسرة لأنه جمع مؤنث سالم من الآتي؟", options: ["السَّمَاوَاتِ", "كَافَّةً", "الْمُشْرِكِينَ", "أَنْفُسَكُمْ"], answer: 0 },
+                    { q: "ما إعراب كلمة 'مُسْلِمَيْنِ' في قوله تعالى: {رَبَّنَا وَاجْعَلْنَا مُسْلِمَيْنِ لَكَ}؟", options: ["مفعول به منصوب وعلامة نصبه الياء لأنه جمع مذكر سالم", "حال منصوبة بالياء", "مفعول به ثان منصوب وعلامة نصبه الياء لأنه مثنى", "تمييز منصوب"], answer: 2 },
+                    { q: "ما علامة جزم الفعل في قوله تعالى: {فَلا تَتَّخِذُوا مِنْهُمْ أَوْلِيَاءَ}؟", options: ["السكون", "حذف حرف العلة", "الكسرة", "حذف النون لأنه من الأفعال الخمسة"], answer: 3 },
+                    { q: "ما إعراب 'كَيْدَ' في قوله تعالى: {إِنَّ كَيْدَ الشَّيْطَانِ كَانَ ضَعِيفاً}؟", options: ["مبتدأ مرفوع", "اسم إنّ منصوب وعلامة نصبه الفتحة الظاهرة", "مضاف إليه مجرور", "خبر إن منصوب"], answer: 1 },
+                    { q: "ما إعراب كلمة 'الصَّالِحَاتِ' في قوله تعالى: {وَيُبَشِّرَ الْمُؤْمِنِينَ الَّذِينَ يَعْمَلُونَ الصَّالِحَاتِ}؟", options: ["مفعول به منصوب وعلامة نصبه الفتحة", "مفعول به منصوب وعلامة نصبه الألف", "مفعول به منصوب وعلامة نصبه الكسرة", "حال منصوبة وعلامة نصبها الفتحة"], answer: 2 },
+                    { q: "ما إعراب كلمة 'مُنْظَرُونَ' في قوله تعالى: {فَيَقُولُوا هَلْ نَحْنُ مُنْظَرُونَ}؟", options: ["مبتدأ مرفوع وعلامة رفعه الواو", "خبر مرفوع وعلامة رفعه الواو", "فاعل مرفوع بالواو", "خبر مرفوع وعلامة رفعه الضمة"], answer: 1 },
+                    { q: "ما نوع الجملة في قوله تعالى: {سَلَامٌ عَلَيْكُمْ بِمَا صَبَرْتُمْ}؟", options: ["جملة فعلية", "جملة ظرفية", "جملة شرطية", "جملة اسمية"], answer: 3 },
+                    { q: "ما إعراب كلمة 'إِثْنَا' في قوله تعالى: {إِنَّ عِدَّةَ الشُّهُورِ عِنْدَ اللهِ إِثْنَا عَشَرَ شَهْراً}؟", options: ["اسم إن منصوب", "خبر إنّ مرفوع وعلامة رفعه الألف لأنه مثنى", "نعت مرفوع بالألف", "مبتدأ مؤخر"], answer: 1 },
+                    { q: "ما نوع الخبر في قوله تعالى: {وَهُمْ لَا يَسْتَكْبِرُونَ}؟", options: ["مفرد", "جملة اسمية", "جملة فعلية", "شبه جملة"], answer: 2 },
+                    { q: "ما خبر (إن) في قوله تعالى: {إِنَّا جَعَلْنَا مَا عَلَى الْأَرْضِ زِينَةً لَهَا}؟", options: ["كلمة (زينة)", "الجملة الفعلية (جعلنا .....)", "الجملة الاسمية (ما عليها.....)", "شبه الجملة (ما عليها)"], answer: 1 },
+                    { q: "ما إعراب الفعل 'يُخْلِفَ' في قوله تعالى: {فَلَنْ يُخْلِفَ اللَّهُ عَهْدَهُ}؟", options: ["مضارع مجزوم بالسكون", "مضارع مرفوع بالضمة", "مضارع منصوب بـ لن وعلامة نصبه الفتحة الظاهرة", "ماضٍ مبني على الفتح"], answer: 2 },
+                    { q: "ما إعراب كلمة 'تُخْرِجُوهُ' في قوله تعالى: {قُلْ هَلْ عِنْدَكُمْ مِنْ عِلْمٍ فَتُخْرِجُوهُ لَنَا}؟", options: ["فعل مضارع مجزوم بـ أن المضمرة وعلامة جزمه حذف النون", "فعل مضارع منصوب بـ أن المضمرة وعلامة نصبه حذف النون", "فعل مضارع مرفوع وعلامة رفعه ثبوت النون", "فعل أمر مبني على حذف النون"], answer: 1 }
+                ]
+            },
+            {
+                title: "الدرس الثاني: أسلوب الشرط",
+                questions: [
+                    { q: "ما هو تعريف أسلوب الشرط؟", options: ["أن يقع الشيء من غير توقف على غيره", "هو الدلالة على زمان الحدث", "أن يقع الشيء لوقوع غيره أي أن يتوقف الثاني على الأول", "هو تأكيد وقوع الفعل"], answer: 2 },
+                    { q: "مم يتكون تركيب أسلوب الشرط؟", options: ["أداة الشرط + جملة جواب الشرط فقط", "أداة الشرط + جملة الشرط + جملة جواب الشرط", "جملة الشرط + جملة جواب الشرط", "أداة نفي + فعل الشرط"], answer: 1 },
+                    { q: "أي من الأدوات الآتية يُعد من أدوات الشرط غير الجازمة؟", options: ["مَنْ", "مَا", "كَيْفَمَا", "لَوْلَا"], answer: 3 },
+                    { q: "أي من الأدوات الآتية يُعد من أدوات الشرط الجازمة؟", options: ["إِذَا", "إِنْ", "كُلَّمَا", "لَمَّا"], answer: 1 },
+                    { q: "ما سبب اقتران جواب الشرط بالفاء في قوله تعالى: {فَإِذَا نُفِخَ فِي الصُّورِ فَلَا أَنسَابَ بَيْنَهُمْ}؟", options: ["لأنه جملة اسمية", "لأنه فعل جامد", "لأنه فعل طلبي", "لأنه منفي"], answer: 3 },
+                    { q: "ما سبب اقتران جواب الشرط بالفاء في قوله تعالى: {إِن تُبْدُوا الصَّدَقَاتِ فَنِعِمَّا هِيَ}؟", options: ["لأنه مسبوق بـ (قد)", "لأنه فعل طلبي", "لأنه فعل جامد", "لأنه جملة اسمية"], answer: 2 },
+                    { q: "ما سبب اقتران جواب الشرط بالفاء في قوله تعالى: {فَمَن زُحْزِحَ عَنِ النَّارِ... فَقَدْ فَازَ}؟", options: ["لأنه فعل جامد", "لأنه مسبوق بـ (قد)", "لأنه فعل طلبي", "لأنه منفي"], answer: 1 },
+                    { q: "ما سبب اقتران جواب الشرط بالفاء في قوله تعالى: {فَإِن تَوَلَّوْا فَقُولُوا اشْهَدُوا}؟", options: ["لأنه جملة اسمية", "لأنه مسبوق بقد", "لأنه فعل طلبي", "لأنه فعل جامد"], answer: 2 },
+                    { q: "ما سبب اقتران جواب الشرط بالفاء في قوله تعالى: {فَمَنْ عَفَا وَأَصْلَحَ فَأَجْرُهُ عَلَى اللَّهِ}؟", options: ["لأنه فعل جامد", "لأنه جملة اسمية", "لأنه فعل طلبي", "لأنه منفي"], answer: 1 },
+                    { q: "ما سبب جزم الفعل 'تَخْرُجْ' في قوله تعالى: {وَاضْمُمْ يَدَكَ إِلَى جَنَاحِكَ تَخْرُجْ بَيْضَاءَ}؟", options: ["لأنه فعل الشرط", "لأنه معطوف على مجزوم", "لأنه وقع في جواب الطلب", "لأنه مسبوق بلم"], answer: 2 },
+                    { q: "ما علامة جزم الفعل المضارع 'أُوفِ' في قوله تعالى: {وَأَوْفُوا بِعَهْدِي أُوفِ بِعَهْدِكُمْ}؟", options: ["السكون", "حذف النون", "الكسرة المقدرة", "حذف حرف العلة"], answer: 3 },
+                    { q: "ما علامة جزم الفعل المضارع 'يَأْتُوكَ' في قوله تعالى: {وَأَذِّنْ فِي النَّاسِ بِالْحَجِّ يَأْتُوكَ رِجَالاً}؟", options: ["السكون", "حذف النون", "ثبوت النون", "حذف حرف العلة"], answer: 1 },
+                    { q: "ما نوع الأداة 'لَوْلَا' في قوله تعالى: {فَلَوْلَا فَضْلُ اللَّهِ عَلَيْكُمْ... لَكُنتُم}؟", options: ["جازمة", "غير جازمة", "حرف نفي", "أداة استفهام"], answer: 1 },
+                    { q: "ما نوع الأداة 'أَيْنَمَا' في قوله تعالى: {أَيْنَمَا تَكُونُوا يُدْرِكُكُمُ الْمَوْتُ}؟", options: ["جازمة", "غير جازمة", "حرف جر", "اسم موصول"], answer: 0 },
+                    { q: "ما إعراب الفعل 'أَهْدِكَ' في قوله تعالى: {فَاتَّبِعْنِي أَهْدِكَ صِرَاطًا سَوِيًّا}؟", options: ["فعل مضارع مجزوم وعلامة جزمه حذف حرف العلة لأنه وقع في جواب الطلب", "فعل ماض مبني على الفتح", "فعل مضارع مجزوم وعلامة جزمه السكون", "فعل أمر مبني على الكسر"], answer: 0 },
+                    { q: "ما إعراب الفعل 'تَلْقَفْ' في قوله تعالى: {وَأَلْقِ مَا فِي يَمِينِكَ تَلْقَفْ مَا صَنَعُوا}؟", options: ["فعل مضارع مرفوع بالضمة", "فعل مضارع منصوب بالفتحة", "فعل مضارع مجزوم وعلامة جزمه السكون لأنه وقع في جواب الطلب", "فعل أمر مبني على السكون"], answer: 2 },
+                    { q: "ما نوع الأداة 'كُلَّمَا' في قوله تعالى: {كُلَّمَا أَرَادُوا أَن يَخْرُجُوا مِنْهَا...}؟", options: ["جازمة", "غير جازمة", "حرف عطف", "أداة نفي"], answer: 1 },
+                    { q: "في قوله تعالى: {وَمَن يَكْتُمْهَا فَإِنَّهُ عَاثِمٌ قَلْبُهُ}، ما هي جملة جواب الشرط؟", options: ["من يكتمها", "يكتمها", "قلبه", "فإنه آثم قلبه"], answer: 3 },
+                    { q: "في قوله تعالى: {وَإِنْ كَذَّبُوكَ فَقُلْ لِي عَمَلِي}، ما هو فعل الشرط؟", options: ["إن", "فقل", "كذبوك", "لي عملي"], answer: 2 },
+                    { q: "ما سبب اقتران جواب الشرط بالفاء في قوله تعالى: {فَإِن كَرِهْتُمُوهُنَّ فَعَسَى أَن تَكْرَهُوا شَيْئًا}؟", options: ["لأنه فعل جامد", "لأنه فعل طلبي", "لأنه جملة اسمية", "لأنه منفي"], answer: 0 }
+                ]
+            },
+            {
+                title: "الدرس الثالث: النكرة والمعرفة",
+                questions: [
+                    { q: "النكرة هي:", options: ["اسم يدل على شيء معين", "اسم يدل على مكان فقط", "اسم يدل على شيء غير معين", "فعل مضارع يفيد الاستمرار"], answer: 2 },
+                    { q: "المعرفة هي:", options: ["اسم يدل على شيء غير معين", "اسم يدل على شيء معين", "فعل ماض يفيد التحقق", "حرف ناسخ"], answer: 1 },
+                    { q: "من أنواع المعارف 'العلم'، وهو:", options: ["نكرة دخلت عليها أل", "اسم أضيف إلى معرفة", "اسم معرفة سُمّي به شخص أو مكان أو حيوان أو أي شيء آخر", "اسم يدل على غائب فقط"], answer: 2 },
+                    { q: "المعرف بالألف واللام هو:", options: ["اسم معرفة نون في آخره", "اسم نكرة دخلت الألف واللام فجعلته معرفة", "اسم موصول يدل على معين", "علم دل على شخص"], answer: 1 },
+                    { q: "أي من الضمائر الآتية يعد ضميراً منفصلاً خاصاً بـ 'الرفع'؟", options: ["إِيَّايَ", "إِيَّاكُمْ", "نَحْنُ", "إِيَّاهُنَّ"], answer: 2 },
+                    { q: "أي من الضمائر الآتية يعد ضميراً منفصلاً خاصاً بـ 'النصب'؟", options: ["أَنَا", "هُوَ", "إِيَّاكُمْ", "أَنْتُنَّ"], answer: 2 },
+                    { q: "الضمير المتصل هو:", options: ["ما يمكن النطق به وحده من غير أن يتصل بكلمة أخرى", "هو الذي لا ينطق به وحده ويتصل دائما بكلمة أخرى", "اسم نكرة", "اسم إشارة"], answer: 1 },
+                    { q: "الضمائر (التاء، وألف الاثنين، وواو الجماعة، ونون النسوة، وياء المخاطبة) إذا اتصلت بالأفعال تكون خاصة بـ:", options: ["النصب", "الجر", "الرفع", "الجزم"], answer: 2 },
+                    { q: "الضمير 'نَا' يمكن أن يكون في محل:", options: ["رفع فقط", "نصب وجر فقط", "رفع، ونصب، وجر", "جر فقط"], answer: 2 },
+                    { q: "الضمير المستتر في فعل الأمر تقديره دائماً:", options: ["هو", "هي", "أنا", "أنت"], answer: 3 },
+                    { q: "أي من الآتي يمثل أسماء الإشارة لجمع العقلاء من ذكور أو إناث؟", options: ["ذَا", "ذِهْ", "هَؤُلَاءِ (أولاء)", "ذَانِ"], answer: 2 },
+                    { q: "الاسم الموصول يتعين المقصود منه بـ:", options: ["الألف واللام", "الإضافة", "جملة بعده تسمى صلة", "التنوين"], answer: 2 },
+                    { q: "يجب أن تشتمل صلة الموصول على:", options: ["حرف جر", "ضمير يعود على الموصول يسمى عائداً", "اسم إشارة", "مفعول مطلق"], answer: 1 },
+                    { q: "أي من الأسماء الموصولة الآتية يستخدم لغير العاقل مطلقاً؟", options: ["مَنْ", "مَا", "الَّذِي", "اللَّاتِي"], answer: 1 },
+                    { q: "المعرّف بالإضافة هو:", options: ["اسم أضيف إلى اسم نكرة", "اسم نكرة دخلت عليه أل", "اسم أضيف إلى واحد من المعارف", "اسم موصول اتصل به ضمير"], answer: 2 },
+                    { q: "ما نوع المعرفة لكلمة 'الصَّالِحَاتِ' في قوله تعالى: {إِلَّا الَّذِينَ ءَامَنُواْ وَعَمِلُوا الصَّالِحَاتِ}؟", options: ["اسم إشارة", "ضمير", "معرّف بأل", "معرّف بالإضافة"], answer: 2 },
+                    { q: "ما نوع المعرفة لكلمة 'الَّذِينَ' في الآية السابقة؟", options: ["اسم إشارة", "اسم موصول", "معرّف بالإضافة", "علم"], answer: 1 },
+                    { q: "ما نوع الضمير 'ها' في كلمة 'فِيهَا' من قوله تعالى: {كَمِشْكَاةٍ فِيهَا مِصْبَاحٌ}؟", options: ["ضمير منفصل", "ضمير متصل", "ضمير مستتر", "اسم إشارة"], answer: 1 },
+                    { q: "ما نوع الضمير للفعل 'يُوقَدُ' في قوله تعالى: {يُوقَدُ مِن شَجَرَةٍ مُّبَارَكَةٍ}؟", options: ["متصل", "منفصل", "مستتر", "لا يوجد ضمير"], answer: 2 },
+                    { q: "ما نوع المعرفة لكلمة 'إِبْرَاهِيمَ' في قوله تعالى: {صُحُفِ إِبْرَاهِيمَ وَمُوسَى}؟", options: ["اسم علَم", "معرف بأل", "مضاف", "اسم موصول"], answer: 0 }
+                ]
+            },
+            {
+                title: "الدرس الرابع: المفعول المطلق",
+                questions: [
+                    { q: "المفعول المطلق هو:", options: ["اسم مرفوع يبين زمان الفعل", "اسم منصوب موافق للفعل في لفظه، ويأتي لتأكيده، أو بيان نوعه، أو عدده", "ظرف مكان منصوب", "اسم مجرور يوافق الفعل"], answer: 1 },
+                    { q: "من أنواع المفعول المطلق 'المؤكد للفعل' ومن شروطه أنه:", options: ["يكون موصوفاً دائماً", "يدل على عدد معين", "لا يكون موصوفاً ولا مضافاً ولا مثنى ولا جمعاً", "يكون مضافاً إلى معرفة"], answer: 2 },
+                    { q: "المفعول المطلق 'المبين للنوع' يكون:", options: ["مصدراً للعدد فقط", "موصوفاً أو مضافاً", "غير موصوف مطلقاً", "مجروراً بحرف جر"], answer: 1 },
+                    { q: "ما نوع المفعول المطلق في قوله تعالى: {وَرَتِّلِ الْقُرْآنَ تَرْتِيلاً}؟", options: ["مبين للنوع", "مبين للعدد", "مؤكد للفعل", "نائب عن المفعول المطلق"], answer: 2 },
+                    { q: "ما نوع المفعول المطلق في قوله تعالى: {فَأَخَذْنَاهُمْ أَخْذَ عَزِيزٍ مُقْتَدِرٍ}؟", options: ["مبين للنوع", "مبين للعدد", "مؤكد للفعل", "صفة للمصدر"], answer: 0 },
+                    { q: "ما نوع المفعول المطلق في قوله تعالى: {فَدُكَّتَا دَكَّةً وَاحِدَةً}؟", options: ["مؤكد للفعل", "مبين للنوع", "مبين للعدد", "اسم مصدر"], answer: 2 },
+                    { q: "ما نوع المفعول المطلق في قوله تعالى: {يُضَاعَفْ لَهَا الْعَذَابُ ضِعْفَيْنِ}؟", options: ["مؤكد للفعل", "مبين للنوع", "مبين للعدد", "نائب عن المفعول المطلق"], answer: 2 },
+                    { q: "ينوب عن المفعول المطلق 'اسم المصدر' وهو الذي:", options: ["يطابق الفعل في جميع حروفه", "حروفه ليست كحروف فعله", "يدل على عدد مرات الفعل", "يسبق الفعل في الجملة"], answer: 1 },
+                    { q: "ما الذي ناب عن المفعول المطلق في قوله تعالى: {وَاللَّهُ أَنْبَتَكُمْ مِنَ الْأَرْضِ نَبَاتاً}؟", options: ["عدده", "مرادفه", "صفته", "اسم مصدره"], answer: 3 },
+                    { q: "ما الذي ناب عن المفعول المطلق في قوله تعالى: {فَاجْلِدُوهُمْ ثَمَانِينَ جَلْدَةً}؟", options: ["عدده", "صفته", "اسم مصدره", "مرادفه"], answer: 0 },
+                    { q: "ما الذي ناب عن المفعول المطلق في قوله تعالى: {فَمَنْ أَظْلَمُ مِمَّنِ افْتَرى عَلَى اللهِ كَذِباً}؟", options: ["نوعه", "عدده", "مرادفه", "كل وبعض"], answer: 2 },
+                    { q: "ما الذي ناب عن المفعول المطلق في قوله تعالى: {فَلَا تَمِيلُوا كُلَّ الْمَيْلِ}؟", options: ["عدده", "كلمة 'كل' المضافة إلى مصدر", "مرادفه", "صفته"], answer: 1 },
+                    { q: "ما الذي ناب عن المفعول المطلق في قوله تعالى: {وَمَا قَتَلُوهُ يَقِيناً} (بتقدير قتلا يقينا)؟", options: ["مرادفه", "صفته", "عدده", "كلمة مضافة للمصدر"], answer: 1 },
+                    { q: "قد يُحذف العامل في المفعول المطلق لشهرته كما في مواضع منها:", options: ["الأمر والدعاء", "بعد حروف الجر", "في الجملة الاسمية فقط", "المبتدأ والخبر"], answer: 0 },
+                    { q: "ما إعراب 'سُبْحَانَ' في قوله: {قُلْ سُبْحَانَ رَبِّي}؟", options: ["مفعول به منصوب", "حال منصوبة", "مفعول مطلق منصوب لفعل محذوف وعلامة نصبه الفتحة الظاهرة", "صفة منصوبة"], answer: 2 },
+                    { q: "ما إعراب 'حُسْناً' في قوله تعالى: {وَقُولُوا لِلنَّاسِ حُسْناً}؟", options: ["حال", "تمييز", "مفعول مطلق أو نائب عن مفعول مطلق منصوب لأنه صفته", "مضاف إليه"], answer: 2 },
+                    { q: "ما الذي ناب عن المفعول المطلق في قوله تعالى: {لَأُعَذِّبَنَّهُ عَذَاباً شَدِيداً}؟", options: ["مرادفه", "عدده", "نوعه", "اسم مصدره (مصدره تعذيبا)"], answer: 3 },
+                    { q: "ما الذي ناب عن المفعول المطلق في قوله تعالى: {أَإِنَّا لَمَبْعُوثُونَ خَلْقاً جَدِيداً}؟", options: ["مرادفه (خلقا مرادف البعث)", "صفته", "عدده", "اسم مصدره"], answer: 0 },
+                    { q: "ما إعراب 'رَأْيَ' في قوله تعالى: {يَرَوْنَهُمْ مِثْلَيْهِمْ رَأْيَ الْعَيْنِ}؟", options: ["مفعول مطلق مبين للنوع", "مفعول مطلق مبين للعدد", "مؤكد للفعل", "نائب عن المفعول المطلق لأنه مرادفه"], answer: 0 },
+                    { q: "ما إعراب 'هَوْناً' في قوله تعالى: {يَمْشُونَ عَلَى الْأَرْضِ هَوْناً}؟", options: ["مفعول به", "مفعول مطلق منصوب لأنه نوعه", "مفعول مطلق مبين للعدد", "نائب عن المفعول المطلق لأنه عدده"], answer: 1 }
+                ]
+            },
+            {
+                title: "الدرس الخامس: المفعول لأجله والمفعول فيه",
+                questions: [
+                    { q: "المفعول لأجله هو:", options: ["اسم مجرور يدل على زمان الفعل", "اسم منصوب يبين سبب الفعل وعلة حصوله", "فعل مضارع يفيد التعليل", "ظرف مكان يبين وجهة الفعل"], answer: 1 },
+                    { q: "ما هي أنواع المفعول لأجله؟", options: ["متصرف وشبه متصرف", "مؤكد للفعل ومبين للنوع", "مجرد من الإضافة ومضاف", "مفرد وجملة وشبه جملة"], answer: 2 },
+                    { q: "ما نوع المفعول لأجله في قوله تعالى: {يَجْعَلُونَ أَصْبِعَهُمْ فِي عَاذَانِهِم ... حَذَرَ الْمَوْتِ}؟", options: ["مجرد من الإضافة", "مضاف", "ظرف متصرف", "نائب عن المفعول المطلق"], answer: 1 },
+                    { q: "ما نوع المفعول لأجله في قوله تعالى: {يَدْعُونَ رَبَّهُمْ خَوْفًا وَطَمَعًا}؟", options: ["مجرد من الإضافة", "مضاف", "مبين للعدد", "شبه متصرف"], answer: 0 },
+                    { q: "ما إعراب 'رِئَاءَ' في قوله تعالى: {كَالَّذِي يُنْفِقُ مَالَهُ رِئَاءَ النَّاسِ}؟", options: ["مفعول فيه ظرف زمان منصوب", "مفعول لأجله منصوب وعلامة نصبه الفتحة الظاهرة، وهو مضاف", "حال منصوبة", "مفعول مطلق"], answer: 1 },
+                    { q: "المفعول فيه هو:", options: ["اسم منصوب يدل على زمان أو مكان وقوع الحدث", "اسم يدل على من وقع عليه الفعل", "أداة ربط بين جملتين", "اسم يبين سبب حصول الفعل"], answer: 0 },
+                    { q: "الظرف 'المتصرف' هو الذي:", options: ["يلازم النصب على الظرفية دائماً", "لا يلازم النصب على الظرفية فينتقل من حال إلى حال (رفعاً ونصباً وجراً)", "يُجر بحرف الجر (مِن) حصراً", "يدل على المكان فقط"], answer: 1 },
+                    { q: "من أمثلة الظرف 'المتصرف':", options: ["عند، قبل، حيث", "الآن، هنا، ثم", "يوم، ساعة، وقت، ليل", "فوق، تحت"], answer: 2 },
+                    { q: "الظرف 'شبه المتصرف' هو الذي:", options: ["ينتقل ليكون مبتدأ أو فاعلاً", "يلازم الجر دائماً", "لا يلازم النصب على الظرفية لكنه يخرج إلى الجر (نصباً وجراً)", "يلازم الرفع دائماً"], answer: 2 },
+                    { q: "من أمثلة الظرف 'شبه المتصرف':", options: ["يوم، ليل", "ساعة، وقت", "عند، قبل، حيث، الآن", "شهر، سنة"], answer: 2 },
+                    { q: "ما إعراب كلمة 'حِينٍ' في قوله تعالى: {وَمَتَّعْنَاهُمْ إِلَى حِينٍ}؟", options: ["مفعول فيه ظرف زمان منصوب", "اسم مجرور وعلامة جره الكسرة", "مبتدأ مرفوع", "حال منصوبة"], answer: 1 },
+                    { q: "ما إعراب كلمة 'حِينَ' في العبارة: (إذا حضر أحدكم الموت حِينَ الوصية)؟", options: ["مضاف إليه مجرور", "اسم مجرور بحرف الجر", "مفعول فيه (ظرف زمان) منصوب وعلامة نصبه الفتحة الظاهرة", "فاعل مرفوع"], answer: 2 },
+                    { q: "ما إعراب 'تَحْتَ' في قوله تعالى: {قَدْ جَعَلَ رَبُّكِ تَحْتَكِ سَرِيًّا}؟", options: ["فاعل", "مفعول به", "مفعول فيه منصوب وعلامة نصبه الفتحة الظاهرة", "مضاف إليه مجرور"], answer: 2 },
+                    { q: "ما إعراب 'فَوْقَ' في قوله تعالى: {وَفَوْقَ كُلِّ ذِي عِلْمٍ عَلِيمٌ}؟", options: ["مفعول فيه ظرف مكان منصوب بالفتحة الظاهرة", "مفعول مطلق منصوب", "مبتدأ مرفوع", "حال منصوبة"], answer: 0 },
+                    { q: "ما إعراب 'مَقَاعِدَ' في قوله تعالى: {وَأَنَّا كُنَّا نَقْعُدُ مِنْهَا مَقَاعِدَ لِلسَّمْعِ}؟", options: ["مفعول به منصوب", "مفعول لأجله منصوب", "مفعول فيه ظرف مكان منصوب وعلامة نصبه الفتحة الظاهرة", "تمييز منصوب"], answer: 2 },
+                    { q: "ما إعراب 'يَوْمَ' في قوله تعالى: {وَيَوْمَ تَقُومُ السَّاعَةُ}؟", options: ["مبتدأ مرفوع", "مفعول فيه ظرف زمان منصوب وعلامة نصبه الفتحة الظاهرة", "فاعل مرفوع", "مضاف إليه مجرور"], answer: 1 },
+                    { q: "ما إعراب 'سَاعَةٍ' في قوله تعالى: {مَا لَبِثُوا غَيْرَ سَاعَةٍ}؟", options: ["مفعول فيه منصوب", "فاعل مرفوع", "مضاف إليه مجرور وعلامة جره الكسرة الظاهرة لأنه متصرف", "تمييز مجرور"], answer: 2 },
+                    { q: "ما إعراب 'لَيْلاً' في قوله تعالى: {سُبْحَانَ الَّذِي أَسْرَى بِعَبْدِهِ لَيْلاً}؟", options: ["مفعول فيه ظرف زمان منصوب وعلامة نصبه الفتحة الظاهرة", "مفعول مطلق", "مفعول لأجله", "حال"], answer: 0 },
+                    { q: "ما إعراب 'وَرَاءَ' في قوله تعالى: {وَكَانَ وَرَاءَهُمْ مَلِكٌ}؟", options: ["فاعل مؤخر", "مفعول فيه ظرف مكان منصوب وعلامة نصبه الفتحة الظاهرة", "اسم كان مرفوع", "ظرف زمان مجرور"], answer: 1 },
+                    { q: "ما إعراب 'عِنْدَ' في قوله تعالى: {عِنْدَ سِدْرَةِ الْمُنْتَهَى}؟", options: ["فاعل", "مبتدأ", "مفعول فيه منصوب وعلامة نصبه الفتحة الظاهرة", "حرف جر"], answer: 2 }
+                ]
+            }
+        ];
+
+        // --------------------------------------------------------------------------
+        // State
+        // --------------------------------------------------------------------------
+        const state = {
+            view: 'home', // 'home', 'quiz', 'result'
+            activeLessonIndex: 0,
+            currentQuestionIndex: 0,
+            score: 0,
+            showFeedback: false,
+            selectedOption: null,
+            isAnswerCorrect: false,
+            lessonScores: {}
+        };
+
+        const appElement = document.getElementById('app');
+
+        // --------------------------------------------------------------------------
+        // Logic Handlers
+        // --------------------------------------------------------------------------
+        
+        function startLesson(index) {
+            state.activeLessonIndex = index;
+            state.currentQuestionIndex = 0;
+            state.score = 0;
+            state.showFeedback = false;
+            state.selectedOption = null;
+            state.view = 'quiz';
+            render();
+        }
+
+        function handleOptionClick(optionIndex) {
+            if (state.showFeedback) return;
+
+            const currentLesson = quizData[state.activeLessonIndex];
+            const currentQuestion = currentLesson.questions[state.currentQuestionIndex];
+            const correct = currentQuestion.answer === optionIndex;
+
+            state.selectedOption = optionIndex;
+            state.isAnswerCorrect = correct;
+            state.showFeedback = true;
+
+            if (correct) {
+                state.score++;
+            }
+            render();
+        }
+
+        function handleNextQuestion() {
+            const currentLesson = quizData[state.activeLessonIndex];
+            
+            if (state.currentQuestionIndex + 1 < currentLesson.questions.length) {
+                state.currentQuestionIndex++;
+                state.showFeedback = false;
+                state.selectedOption = null;
+                render();
+            } else {
+                // End of lesson
+                // Save high score
+                const currentScore = state.lessonScores[state.activeLessonIndex] || 0;
+                state.lessonScores[state.activeLessonIndex] = Math.max(currentScore, state.score);
+                
+                state.view = 'result';
+                render();
+            }
+        }
+
+        function goHome() {
+            state.view = 'home';
+            render();
+        }
+
+        // --------------------------------------------------------------------------
+        // Render Views
+        // --------------------------------------------------------------------------
+
+        function getHomeHTML() {
+            return `
+                <div class="max-w-md w-full mx-auto bg-white rounded-2xl shadow-lg overflow-hidden animate-fade-in">
+                    <div class="bg-emerald-600 p-6 text-white text-center">
+                        <i data-lucide="book-open" class="w-16 h-16 mx-auto mb-4"></i>
+                        <h1 class="text-2xl font-bold mb-2">مسابقة النحو القرآني</h1>
+                        <p class="opacity-90">برنامج مدارج الإتقان</p>
+                    </div>
+                    
+                    <div class="p-6">
+                        <p class="text-gray-600 mb-4 text-center">اختر درساً للبدء في الاختبار</p>
+                        <div class="space-y-3">
+                            ${quizData.map((lesson, idx) => {
+                                const score = state.lessonScores[idx];
+                                const hasScore = score !== undefined;
+                                return `
+                                <button
+                                    onclick="startLesson(${idx})"
+                                    class="w-full p-4 flex items-center justify-between bg-white border border-gray-200 rounded-xl hover:border-emerald-500 hover:bg-emerald-50 transition-all shadow-sm group"
+                                >
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+                                            ${idx + 1}
+                                        </div>
+                                        <span class="font-semibold text-gray-800 group-hover:text-emerald-700 text-sm md:text-base">
+                                            ${lesson.title.split(':')[1] || lesson.title}
+                                        </span>
+                                    </div>
+                                    ${hasScore ? `
+                                        <div class="flex items-center text-xs font-bold text-amber-500 bg-amber-50 px-2 py-1 rounded-full">
+                                            <i data-lucide="trophy" class="w-3 h-3 ml-1"></i>
+                                            ${score}/${lesson.questions.length}
+                                        </div>
+                                    ` : `
+                                        <i data-lucide="chevron-left" class="w-5 h-5 text-gray-400 group-hover:text-emerald-500"></i>
+                                    `}
+                                </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 text-center text-xs text-gray-400">
+                        <p class="mb-2">تم إعداد الأسئلة بناءً على المادة العلمية المرفقة</p>
+                        <p class="font-medium text-gray-500">تصميم: عبدالله بن خلف الرواحي</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getQuizHTML() {
+            const currentLesson = quizData[state.activeLessonIndex];
+            const questionData = currentLesson.questions[state.currentQuestionIndex];
+            const totalQuestions = currentLesson.questions.length;
+            const progress = ((state.currentQuestionIndex) / totalQuestions) * 100;
+
+            return `
+                <div class="w-full max-w-lg bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col min-h-[600px] animate-fade-in">
+                    <!-- Header -->
+                    <div class="bg-gray-800 text-white p-4">
+                        <div class="flex justify-between items-center mb-2">
+                             <div class="flex items-center gap-3">
+                                <button 
+                                    onclick="goHome()" 
+                                    class="p-1 hover:bg-gray-700 rounded-full transition-colors text-gray-400 hover:text-white"
+                                    title="العودة للقائمة الرئيسية"
+                                >
+                                    <i data-lucide="home" class="w-5 h-5"></i>
+                                </button>
+                                <span class="text-xs font-light text-gray-300">الدرس ${state.activeLessonIndex + 1}</span>
+                            </div>
+                            <div class="flex items-center gap-2 bg-gray-700 px-3 py-1 rounded-full text-sm">
+                                <span class="text-emerald-400 font-bold">${state.score}</span>
+                                <span class="text-gray-400">/</span>
+                                <span>${totalQuestions}</span>
+                            </div>
+                        </div>
+                        <h2 class="text-lg font-bold leading-tight">${currentLesson.title.split(':')[1] || currentLesson.title}</h2>
+                        
+                        <!-- Progress Bar -->
+                        <div class="mt-4 h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
+                            <div 
+                                class="h-full bg-emerald-500 transition-all duration-500 ease-out"
+                                style="width: ${progress}%"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <!-- Question Area -->
+                    <div class="p-6 flex-grow flex flex-col">
+                        <div class="mb-6">
+                            <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded">
+                                السؤال ${state.currentQuestionIndex + 1}
+                            </span>
+                            <h3 class="text-xl font-bold text-gray-800 mt-3 leading-relaxed">
+                                ${questionData.q}
+                            </h3>
+                        </div>
+
+                        <!-- Options -->
+                        <div class="space-y-3 mb-6">
+                            ${questionData.options.map((option, idx) => {
+                                let btnClass = "w-full p-4 text-right rounded-xl border-2 transition-all duration-200 text-sm md:text-base font-medium flex items-center justify-between ";
+                                let icon = '';
+
+                                if (state.showFeedback) {
+                                    if (idx === questionData.answer) {
+                                        btnClass += "bg-emerald-100 border-emerald-500 text-emerald-800";
+                                        icon = `<i data-lucide="check-circle" class="w-5 h-5 text-emerald-600"></i>`;
+                                    } else if (idx === state.selectedOption) {
+                                        btnClass += "bg-red-100 border-red-500 text-red-800";
+                                        icon = `<i data-lucide="x-circle" class="w-5 h-5 text-red-600"></i>`;
+                                    } else {
+                                        btnClass += "bg-gray-50 border-gray-100 text-gray-400 opacity-60";
+                                    }
+                                } else {
+                                    btnClass += "bg-white border-gray-100 hover:border-emerald-200 hover:bg-gray-50 text-gray-700 shadow-sm cursor-pointer";
+                                }
+
+                                return `
+                                    <button
+                                        onclick="handleOptionClick(${idx})"
+                                        ${state.showFeedback ? 'disabled' : ''}
+                                        class="${btnClass}"
+                                    >
+                                        <span>${option}</span>
+                                        ${icon}
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+
+                        <!-- Feedback -->
+                        ${state.showFeedback ? `
+                            <div class="mt-auto p-4 rounded-xl border animate-fade-in ${state.isAnswerCorrect ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}">
+                                <div class="flex items-center gap-2 mb-2 font-bold">
+                                    ${state.isAnswerCorrect ? 
+                                        `<span class="text-emerald-700">إجابة صحيحة!</span>` : 
+                                        `<span class="text-red-700">إجابة خاطئة</span>`
+                                    }
+                                </div>
+                                ${!state.isAnswerCorrect ? `
+                                    <p class="text-sm text-gray-600 mb-3">
+                                        الإجابة الصحيحة هي: <span class="font-bold">${questionData.options[questionData.answer]}</span>
+                                    </p>
+                                ` : ''}
+                                <button
+                                    onclick="handleNextQuestion()"
+                                    class="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white rounded-lg font-bold flex items-center justify-center gap-2 transition-colors"
+                                >
+                                    ${state.currentQuestionIndex + 1 === totalQuestions ? "عرض النتيجة" : "السؤال التالي"}
+                                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getResultHTML() {
+            const currentLesson = quizData[state.activeLessonIndex];
+            const totalQuestions = currentLesson.questions.length;
+            const percentage = (state.score / totalQuestions) * 100;
+            
+            let message = "";
+            let colorClass = "";
+            let icon = "";
+            
+            if (percentage >= 90) { 
+                message = "ممتاز! أحسنت صنعاً"; 
+                colorClass = "text-emerald-600"; 
+                icon = `<div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center animate-bounce"><i data-lucide="trophy" class="w-12 h-12 text-emerald-600"></i></div>`;
+            } else if (percentage >= 70) { 
+                message = "جيد جداً! استمر"; 
+                colorClass = "text-blue-600";
+                icon = `<div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center animate-bounce"><i data-lucide="trophy" class="w-12 h-12 text-emerald-600"></i></div>`;
+            } else if (percentage >= 50) { 
+                message = "جيد، ولكن تحتاج للمراجعة"; 
+                colorClass = "text-amber-600";
+                icon = `<div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center"><i data-lucide="refresh-cw" class="w-12 h-12 text-gray-500"></i></div>`;
+            } else { 
+                message = "حاول مرة أخرى بعد المراجعة"; 
+                colorClass = "text-red-600";
+                icon = `<div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center"><i data-lucide="refresh-cw" class="w-12 h-12 text-gray-500"></i></div>`;
+            }
+
+            return `
+                <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden text-center p-8 animate-fade-in">
+                    <div class="mb-6 flex justify-center">
+                        ${icon}
+                    </div>
+                    
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">نتيجة الاختبار</h2>
+                    <p class="text-gray-500 mb-6">${currentLesson.title}</p>
+                    
+                    <div class="text-5xl font-bold text-gray-800 mb-2">
+                        ${state.score}<span class="text-2xl text-gray-400">/${totalQuestions}</span>
+                    </div>
+                    
+                    <p class="text-lg font-medium mb-8 ${colorClass}">${message}</p>
+                    
+                    <div class="space-y-3">
+                        <button 
+                            onclick="startLesson(${state.activeLessonIndex})"
+                            class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
+                        >
+                            <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                            إعادة المحاولة
+                        </button>
+                        <button 
+                            onclick="goHome()"
+                            class="w-full py-3 px-4 bg-white border-2 border-gray-200 hover:bg-gray-50 text-gray-700 rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
+                        >
+                            <i data-lucide="home" class="w-5 h-5"></i>
+                            العودة للقائمة الرئيسية
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --------------------------------------------------------------------------
+        // Main Render Loop
+        // --------------------------------------------------------------------------
+        function render() {
+            let html = '';
+            if (state.view === 'home') {
+                html = getHomeHTML();
+            } else if (state.view === 'quiz') {
+                html = getQuizHTML();
+            } else if (state.view === 'result') {
+                html = getResultHTML();
+            }
+            appElement.innerHTML = html;
+            
+            // Re-initialize icons
+            lucide.createIcons();
+        }
+
+        // Initial render
+        render();
+
+    </script>
+</body>
+</html>
